@@ -45,9 +45,22 @@ impl Warning {
 
 This code will crash if it is run. Be sure to remove this todo before running
 your program.",
-                            printer.pretty_print(typ, 0)
-                        ),
-                    )
+                        printer.pretty_print(typ, 0)
+                    );
+                    Diagnostic {
+                        title: "Todo found".into(),
+                        text,
+                        level: diagnostic::Level::Warning,
+                        location: Some(Location {
+                            src: "todo".into(),
+                            path: path.to_path_buf(),
+                            label: diagnostic::Label {
+                                text: Some("Todo found".into()),
+                                span: *location,
+                            },
+                            extra_labels: Vec::new(),
+                        }),
+                    }
                 }
 
                 type_::Warning::ImplicitlyDiscardedResult { location } => (
@@ -127,14 +140,14 @@ your program.",
                     location, imported, ..
                 } => {
                     let title = if *imported {
-                        "Unused imported type".to_string()
+                        "Unused imported type".into()
                     } else {
-                        "Unused private type".to_string()
+                        "Unused private type".into()
                     };
                     let text = if *imported {
                         "This imported type is never used.".to_string()
                     } else {
-                        "This private type is never used.".to_string()
+                        "This private type is never used.".into()
                     };
 
                     (
@@ -160,14 +173,14 @@ your program.",
                     location, imported, ..
                 } => {
                     let title = if *imported {
-                        "Unused imported item".to_string()
+                        "Unused imported item".into()
                     } else {
-                        "Unused private type constructor".to_string()
+                        "Unused private type constructor".into()
                     };
                     let text = if *imported {
                         "This imported type constructor is never used.".to_string()
                     } else {
-                        "This private type constructor is never used.".to_string()
+                        "This private type constructor is never used.".into()
                     };
 
                     (
@@ -265,7 +278,6 @@ your program.",
     }
 
     pub fn pretty(&self, buffer: &mut Buffer) {
-        #[allow(clippy::expect_used)]
         buffer
             .write_all(b"\n")
             .expect("error pretty buffer write space before");
